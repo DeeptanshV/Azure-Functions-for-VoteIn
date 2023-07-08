@@ -31,8 +31,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         cursor.executemany(query,records) 
         con.commit()
         return func.HttpResponse(
-            json.dumps({"NAME" : name, "Email" : email, "Pass": passw, "ssl" : get_ssl_cert()}),
+            json.dumps({"msg":"Success"}),
             mimetype="application/json"
         )
     except Exception as e:
-        return func.HttpResponse("Server Error")
+        return func.HttpResponse(
+            json.dumps({"msg":"Server error"}),
+            mimetype="application/json")

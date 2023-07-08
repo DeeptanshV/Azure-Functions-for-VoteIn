@@ -25,15 +25,35 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         con = mysql.connector.connect( host=host,port=port,user=user,password=password,db=db,ssl_ca='C:\\Users\\deept\\Desktop\\functions\\vote\\BaltimoreCyberTrustRoot.crt.pem')
         cursor=con.cursor()
-        query="SELECT email,pass FROM userinfo" 
-        records=[(email,passw)]
-        cursor.execute(query,records) 
-        con.commit()
+        query=f"select * from userinfo where email=%s" 
+        print(query)
+        cursor.execute(query,(email,)) 
+        # con.commit()
+        data=cursor.fetchall()[0]
         
-        return func.HttpResponse(
-            json.dumps({"Email" : email, "Pass": passw, "ssl" : get_ssl_cert()}),
+        if(passw==data[2]):
+            return func.HttpResponse(
+            json.dumps({
+                "name":data[0],
+                "email":data[1],
+                "password":data[2],
+                "VotedTo":data[3]
+                }),
             mimetype="application/json"
         )
+        else:
+            return func.HttpResponse(
+                json.dumps({
+                    "message":"No account found"
+                }),
+                mimetype="application/json"
+            )
+
+        
+       
         
     except Exception as e:
-        return func.HttpResponse("Server Error")
+        return func.HttpResponse(
+            json.dumps({"message":"server error"}),
+            mimetype="application/json"
+        )
